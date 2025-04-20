@@ -1,1 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sonic Plinko Stars</title>
+  <style>
+    body {
+      background: radial-gradient(circle at top, #003366, #000);
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
+    header {
+      background: #ffcc00;
+      color: #001f3f;
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    #balance {
+      font-weight: bold;
+    }
+
+    #cashout {
+      background-color: #ff4136;
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+
+    #cashout:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+
+    main {
+      margin-top: 50px;
+      text-align: center;
+    }
+
+    #progress-section {
+      margin-top: 30px;
+    }
+
+    progress {
+      width: 300px;
+      height: 25px;
+      border-radius: 10px;
+    }
+
+    #play-btn {
+      margin-top: 40px;
+      background-color: #0074D9;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+    #play-btn:hover {
+      background-color: #005fa3;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Balance: £<span id="balance">0.00</span></h1>
+    <button id="cashout" disabled>Cash Out</button>
+  </header>
+
+  <main>
+    <h2>Sonic Plinko Stars</h2>
+    <p>Drop a ring and watch it bounce! Land a multiplier to win big!</p>
+
+    <div id="progress-section">
+      <progress id="progress" value="0" max="10"></progress>
+      <p>£<span id="progress-value">0.00</span> / £10.00</p>
+    </div>
+
+    <button id="play-btn">DROP A RING!</button>
+
+    <div id="result"></div>
+  </main>
+
+  <script>
+    let balance = 0.00;
+    const baseReward = 1.00;
+
+    const multipliers = [0.5, 1, 2, 5, 10];
+    const weights = [0.25, 0.35, 0.25, 0.1, 0.05]; // more chance of low multipliers
+
+    const balanceDisplay = document.getElementById('balance');
+    const progressBar = document.getElementById('progress');
+    const progressValue = document.getElementById('progress-value');
+    const cashoutBtn = document.getElementById('cashout');
+    const playBtn = document.getElementById('play-btn');
+    const result = document.getElementById('result');
+
+    function getRandomMultiplier() {
+      const rand = Math.random();
+      let sum = 0;
+      for (let i = 0; i < multipliers.length; i++) {
+        sum += weights[i];
+        if (rand <= sum) return multipliers[i];
+      }
+      return 1;
+    }
+
+    playBtn.addEventListener('click', () => {
+      const multiplier = getRandomMultiplier();
+      const reward = parseFloat((baseReward * multiplier).toFixed(2));
+      balance += reward;
+      if (balance > 10) balance = 10;
+
+      balanceDisplay.textContent = balance.toFixed(2);
+      progressBar.value = balance;
+      progressValue.textContent = balance.toFixed(2);
+
+      result.innerHTML = `You landed on <strong>x${multiplier}</strong> and won <strong>£${reward.toFixed(2)}</strong>!`;
+
+      if (balance >= 10) {
+        cashoutBtn.disabled = false;
+      }
+    });
+
+    cashoutBtn.addEventListener('click', () => {
+      alert("Redirecting to PayPal...");
+      window.location.href = "https://www.paypal.com/";
+    });
+  </script>
+
+</body>
+</html>
